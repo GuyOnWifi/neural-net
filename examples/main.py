@@ -1,5 +1,5 @@
 import sys
-sys.path.append("..")
+sys.path.append("../src")
 
 from datasets import load_dataset
 
