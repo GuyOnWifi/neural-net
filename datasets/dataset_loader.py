@@ -1,9 +1,11 @@
 import os
 import numpy as np
 def load(dataset):
-    if not os.path.exists(f"{dataset}.npz"):
+    dirname = os.path.dirname(os.path.realpath(__file__))
+    dataset_file = os.path.join(dirname, f"{dataset}.npz")
+    if not os.path.exists(dataset_file):
         raise FileNotFoundError(f"Dataset \"{dataset}\" does not exist")
-    return np.load(f"{dataset}.npz")
+    return np.load(dataset_file)
 
 def split_batches(batch_size, *datasets):
     res = []
