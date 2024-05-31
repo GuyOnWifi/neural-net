@@ -10,9 +10,6 @@ class Dense():
         self.bias_sensitivity = []
         self.weight_sensitivity = []
 
-        self.total_weight_sens = np.zeros((shape[1], shape[0]))
-        self.total_bias_sens = np.zeros((shape[1], 1))
-
         if (activation == 'relu'):
             self.activation = self.relu
             self.d_activation = self.d_relu
@@ -28,7 +25,7 @@ class Dense():
     
     def feedforward(self, inputs):
         self.inputs = inputs
-        self.weighted_sums = np.dot(self.weights, inputs) + self.biases
+        self.weighted_sums = np.matmul(self.weights[np.newaxis, ...], inputs) + self.biases[np.newaxis, ...]
         return self.activation(self.weighted_sums)
 
     def backprop(self, activation_sensitivity):
@@ -36,9 +33,9 @@ class Dense():
         # calc how sensitive the bias is (calculate the sigmoid deriv and multiply by how sensitive the output activations are)
         self.bias_sensitivity = activation_sensitivity * self.d_activation(self.weighted_sums)
         # calc how sensitive weights are, input is transposed for matrix multiplication purposes
-        self.weight_sensitivity = np.dot(self.bias_sensitivity, self.inputs.transpose())
+        self.weight_sensitivity = np.matmul(self.bias_sensitivity, self.inputs.transpose([0, 2, 1]))
         # return the sensitivity of previous activation, will be used in next layer
-        return np.dot(self.weights.transpose(), self.bias_sensitivity)
+        return np.matmul(self.weights.transpose()[np.newaxis, ...], self.bias_sensitivity)
     
     def relu(self, inp):
         return inp * (inp > 0)

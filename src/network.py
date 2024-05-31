@@ -29,52 +29,44 @@ class Network:
         for i in range(len(self.layers) - 1, -1, -1):
             activation_sensitivity = self.layers[i].backprop(activation_sensitivity)
 
-    def sgd(self, training_data, learn_rate, batch_size, epochs=1, validation_data=None):
-        mini_batches = [training_data[k:k + batch_size] for k in range(0, len(training_data), batch_size)]
-        
+    def sgd(self, training_data, learn_rate, epochs=1, validation_data=None):
+        tr_x, tr_y = training_data
+
         previous_cost = None
         for i in range(epochs):
             start = time.time()
-            batch_num = 0
-            for batch in mini_batches:
-                self.fit(batch, learn_rate)
-                batch_num += 1
-                print(f"\rEpoch {i + 1}/{epochs}: ({batch_num}/{len(mini_batches)})", end="")
-
+            for batch_num in range(len(tr_x)):
+                self.fit((tr_x[batch_num], tr_y[batch_num]), learn_rate)
+                print(f"\rEpoch {i + 1}/{epochs}: ({batch_num}/{len(tr_x)})", end="")
+            
+            elapsed = (time.time() - start) * 1000
             if validation_data:
-                elapsed = (time.time() - start) * 1000
                 correct, avg_cost = self.evaluate(validation_data)
-                print(f"\rEpoch {i + 1}/{epochs}: {correct} / {len(validation_data)}, Time: {round(elapsed)}ms ({round(elapsed / len(mini_batches))}ms/batch), Average Cost = {round(avg_cost, 5)} {'({0:+})'.format(round(avg_cost - previous_cost, 5)) if previous_cost is not None else ''}")
+                print(f"\rEpoch {i + 1}/{epochs}: {correct} / {validation_data[0].shape[0]}, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch), Average Cost = {np.round(avg_cost, 5)} {'({0:+})'.format(np.round(avg_cost - previous_cost, 5)) if previous_cost is not None else ''}")
                 previous_cost = avg_cost
+            else:
+                print(f"\rEpoch {i + 1} Complete, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch)")
             
     def fit(self, batch, learn_rate):
-        # reset variables
-        for l in self.layers:
-            l.total_bias_sens *= 0
-            l.total_weight_sens *= 0
+        inp, exp = batch
+        self.backprop(inp, exp)
 
-        for inp, exp in batch:
-            self.backprop(inp, exp)
-
-            # sum up total sensitivity
-            for l in self.layers:
-                l.total_bias_sens += l.bias_sensitivity
-                l.total_weight_sens += l.weight_sensitivity
-                
-        # adjust the weights and biases
+        # update weight and biases based on gradients
         for l in self.layers:
-            l.biases -= learn_rate * (l.total_bias_sens / len(batch))
-            l.weights -= learn_rate * (l.total_weight_sens / len(batch))
+            total_bias_sens = np.sum(l.bias_sensitivity, axis=0)
+            total_weight_sens = np.sum(l.weight_sensitivity, axis=0)
+            batch_size = inp.shape[0]
+            l.biases -= learn_rate * (total_bias_sens / batch_size)
+            l.weights -= learn_rate * (total_weight_sens / batch_size)       
 
     def evaluate(self, validation_data):
-        total_cost = 0
-        total_correct = 0
-        for inp, exp in validation_data:
-            out = self.feedforward(inp)
-            total_cost += np.sum(self.cost(out, exp))
-            if np.argmax(out) == np.argmax(exp):
-                total_correct += 1
-        return total_correct, total_cost / len(validation_data)
+        val_x, val_y = validation_data
+        out = self.feedforward(val_x)
+
+        total_cost = np.sum(self.cost(out, val_y)) 
+        total_correct = np.sum(np.argmax(out, axis=1) == np.argmax(val_y, axis=1))
+
+        return total_correct, total_cost / val_x.shape[0]
 
     def cost(self, output, expected):
         return np.square(output - expected)
