@@ -35,6 +35,9 @@ class Network:
         train_data_size = 0
         for t in training_data[0]:
           train_data_size += len(t)
+        val_data_size = 0
+        for v in validation_data[0]:
+          val_data_size += len(v)
 
         for i in range(epochs):
             start = time.time()
@@ -44,8 +47,9 @@ class Network:
             
             elapsed = (time.time() - start) * 1000
             if validation_data:
-                correct, avg_cost = self.evaluate(validation_data)
-                print(f"\rEpoch {i + 1}/{epochs}: {correct} / {validation_data[0].shape[0]}, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch), Average Cost = {np.round(avg_cost, 5)} {'({0:+})'.format(np.round(avg_cost - previous_cost, 5)) if previous_cost is not None else ''}")
+                correct, total_cost = self.evaluate(validation_data)
+                avg_cost = total_cost / val_data_size
+                print(f"\rEpoch {i + 1}/{epochs}: {correct} / {val_data_size}, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch), Average Cost = {np.round(avg_cost, 5)} {'({0:+})'.format(np.round(avg_cost - previous_cost, 5)) if previous_cost is not None else ''}")
                 previous_cost = avg_cost
             else:
                 print(f"\rEpoch {i + 1} Complete, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch)")
@@ -64,12 +68,15 @@ class Network:
 
     def evaluate(self, validation_data):
         val_x, val_y = validation_data
-        out = self.feedforward(val_x)
+        total_cost = 0
+        total_correct = 0
+        for i in range(len(validation_data[0])):
+          out = self.feedforward(val_x[i])
 
-        total_cost = np.sum(self.cost(out, val_y)) 
-        total_correct = np.sum(np.argmax(out, axis=1) == np.argmax(val_y, axis=1))
+          total_cost += np.sum(self.cost(out, val_y[i]))
+          total_correct += np.sum(np.argmax(out, axis=1) == np.argmax(val_y[i], axis=1))
 
-        return total_correct, total_cost / val_x.shape[0]
+        return total_correct, total_cost
 
     def cost(self, output, expected):
         return np.square(output - expected)
