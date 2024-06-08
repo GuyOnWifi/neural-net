@@ -29,14 +29,17 @@ class Network:
         for i in range(len(self.layers) - 1, -1, -1):
             activation_sensitivity = self.layers[i].backprop(activation_sensitivity)
 
-    def sgd(self, training_data, learn_rate, epochs=1, validation_data=None):
+    def sgd(self, training_data, learn_rate, lmbda, epochs=1, validation_data=None):
         tr_x, tr_y = training_data
-
         previous_cost = None
+        train_data_size = 0
+        for t in training_data[0]:
+          train_data_size += len(t)
+
         for i in range(epochs):
             start = time.time()
             for batch_num in range(len(tr_x)):
-                self.fit((tr_x[batch_num], tr_y[batch_num]), learn_rate)
+                self.fit((tr_x[batch_num], tr_y[batch_num]), learn_rate, lmbda, train_data_size)
                 print(f"\rEpoch {i + 1}/{epochs}: ({batch_num}/{len(tr_x)})", end="")
             
             elapsed = (time.time() - start) * 1000
@@ -47,7 +50,7 @@ class Network:
             else:
                 print(f"\rEpoch {i + 1} Complete, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch)")
             
-    def fit(self, batch, learn_rate):
+    def fit(self, batch, learn_rate, lmbda, total_size):
         inp, exp = batch
         self.backprop(inp, exp)
 
@@ -57,7 +60,7 @@ class Network:
             total_weight_sens = np.sum(l.weight_sensitivity, axis=0)
             batch_size = inp.shape[0]
             l.biases -= learn_rate * (total_bias_sens / batch_size)
-            l.weights -= learn_rate * (total_weight_sens / batch_size)       
+            l.weights -= learn_rate * (total_weight_sens / batch_size) + learn_rate * (lmbda / total_size) * l.weights
 
     def evaluate(self, validation_data):
         val_x, val_y = validation_data
