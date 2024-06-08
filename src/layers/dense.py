@@ -4,7 +4,7 @@ class Dense():
     def __init__(self, shape, activation=None):
         self.shape = shape
         self.biases = np.random.randn(shape[1], 1)
-        self.weights = np.random.randn(shape[1], shape[0])
+        self.weights = np.random.randn(shape[1], shape[0]) / np.sqrt(shape[0])
         self.weighted_sums = []
         self.inputs = []
         self.bias_sensitivity = []
