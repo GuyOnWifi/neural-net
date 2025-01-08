@@ -17,9 +17,9 @@ from layers.dense import Dense
 net = Network()
 
 net.add_layers(
-    Dense((784, 80), activation="sigmoid"),
-    Dense((80, 80), activation="sigmoid"),
-    Dense((80, 10), activation="sigmoid"),
+    Dense((784, 80), activation="relu"),
+    Dense((80, 80), activation="relu"),
+    Dense((80, 10), activation="softmax"),
 )
 
 #net.load_model("network.json")
