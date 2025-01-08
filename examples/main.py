@@ -24,6 +24,6 @@ net.add_layers(
 
 #net.load_model("network.json")
 
-net.sgd((train_data, train_ans), 3, 0.01, epochs=10, validation_data=(test_data, test_ans))
+net.sgd((train_data, train_ans), 0.001, 0.01, epochs=10, validation_data=(test_data, test_ans))
 
 net.export_model("network.json")
