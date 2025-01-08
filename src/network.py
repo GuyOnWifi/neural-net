@@ -6,7 +6,7 @@ class Network:
     def __init__(self):
         self.layers = []
         self.size = []
-    
+
     def add_layers(self, *layers):
         for l in layers:
             self.layers.append(l)
@@ -14,15 +14,13 @@ class Network:
                 self.size.pop()
             self.size.append(l.shape[0])
             self.size.append(l.shape[1])
-    
+
     def feedforward(self, input):
         for l in self.layers:
             input = l.feedforward(input)
         return input
 
-    def backprop(self, input, expected):
-        # feed data through model to calc weights, biases, activations, etc
-        output = self.feedforward(input)
+    def backprop(self, output, expected):
         # calculate how sensitive the output activation is to the cost func
         activation_sensitivity = self.d_cost(output, expected)
         # loop through model, running backprop to get the gradients
@@ -41,28 +39,36 @@ class Network:
 
         for i in range(epochs):
             start = time.time()
+            training_correct = 0
+            training_total = 0
+            training_cost = 0
             for batch_num in range(len(tr_x)):
-                self.fit((tr_x[batch_num], tr_y[batch_num]), learn_rate, lmbda, train_data_size)
-                print(f"\rEpoch {i + 1}/{epochs}: ({batch_num}/{len(tr_x)})", end="")
-            
+                # feed data through model to calc weights, biases, activations, etc
+                batch_size = tr_x[batch_num].shape[0]
+                output = self.feedforward(tr_x[batch_num])
+                self.backprop(output, tr_y[batch_num])
+                self.update_parameters(learn_rate, lmbda, batch_size, train_data_size)
+
+                training_correct += np.sum(np.argmax(output, axis=1) == np.argmax(tr_y[batch_num], axis=1))
+                training_total += batch_size
+                training_cost += np.sum(self.cost(output, tr_y[batch_num]))
+                print(f"\rEpoch {i + 1}/{epochs}: ({batch_num + 1}/{len(tr_x)}) | Accuracy: {training_correct}/{training_total} | Cost: {training_cost / training_total}", end="")
+
             elapsed = (time.time() - start) * 1000
+            print(f"\rEpoch {i + 1} Complete, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch), Test Accuracy: {training_correct} / {training_total}, Average Test Cost: {training_cost / training_total}", end="")
             if validation_data:
                 correct, total_cost = self.evaluate(validation_data)
                 avg_cost = total_cost / val_data_size
-                print(f"\rEpoch {i + 1}/{epochs}: {correct} / {val_data_size}, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch), Average Cost = {np.round(avg_cost, 5)} {'({0:+})'.format(np.round(avg_cost - previous_cost, 5)) if previous_cost is not None else ''}")
+                print(f", Validation Accuracy: {correct} / {val_data_size}, Validation Average Cost = {np.round(avg_cost, 5)} {'({0:+})'.format(np.round(avg_cost - previous_cost, 5)) if previous_cost is not None else ''}", end="")
                 previous_cost = avg_cost
-            else:
-                print(f"\rEpoch {i + 1} Complete, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch)")
+            print()
             
-    def fit(self, batch, learn_rate, lmbda, total_size):
-        inp, exp = batch
-        self.backprop(inp, exp)
 
+    def update_parameters(self, learn_rate, lmbda, batch_size, total_size):
         # update weight and biases based on gradients
         for l in self.layers:
             total_bias_sens = np.sum(l.bias_sensitivity, axis=0)
             total_weight_sens = np.sum(l.weight_sensitivity, axis=0)
-            batch_size = inp.shape[0]
             l.biases -= learn_rate * (total_bias_sens / batch_size)
             l.weights -= learn_rate * (total_weight_sens / batch_size) + learn_rate * (lmbda / total_size) * l.weights
 
@@ -98,7 +104,7 @@ class Network:
         for i in range(len(data["biases"])):
             w = np.array(data["biases"][i])
             self.layers[i].biases = w
-    
+
     def export_model(self, filename):
         data = {
             "sizes": self.size,
