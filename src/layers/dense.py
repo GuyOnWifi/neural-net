@@ -60,6 +60,7 @@ class Dense():
         e_x = np.exp(x - np.max(x, axis=1, keepdims=True))
         return e_x / e_x.sum(axis=1, keepdims=True)
     
+    # this implementation already transposes it
     def d_softmax(self, x):
         # jacobian matrix magic
         sm = self.softmax(x).squeeze()  # shape: (n, 10)
@@ -69,6 +70,7 @@ class Dense():
         sm_row = sm[:, np.newaxis, :]  # (n, 1, 10)
 
         # Compute Jacobian matrix for each example using broadcasting
+        # np.identity forms diagonals (kronecker delta function i=j case)
         jacobian = sm_row * np.identity(10) - sm_col * sm_row  # (n, 10, 10)
 
         return jacobian

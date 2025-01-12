@@ -6,9 +6,9 @@ from layers.dense import Dense
 net = Network()
 
 net.add_layers(
-    Dense((784, 80), activation="sigmoid"),
-    Dense((80, 80), activation="sigmoid"),
-    Dense((80, 10), activation="sigmoid"),
+    Dense((784, 80), activation="relu"),
+    Dense((80, 80), activation="relu"),
+    Dense((80, 10), activation="softmax"),
 )
 
 net.load_model("network.json")
@@ -49,7 +49,9 @@ def center_image(image):
 title_font = pygame.font.SysFont("arial", 30)
 body_font = pygame.font.SysFont("arial", 20)
 
+img = []
 def evaluate_image():
+    global img
     img = pygame.surfarray.array2d(drawing_board)
     img = (img / 16777215)
     img = img.reshape(28, 16, 28, 16)
@@ -59,7 +61,6 @@ def evaluate_image():
 
     img = img.reshape(784, 1)
     results = net.feedforward(img[np.newaxis, ...])[0]
-    total = np.sum(results)
 
     pygame.draw.rect(
         screen,
@@ -70,7 +71,7 @@ def evaluate_image():
     screen.blit(surface, (448 + 4, 0 + 4))
 
     for x in range(10):
-        surface = body_font.render(f"{x}: {round((results[x][0] / total) * 100, 2)}%", True, (0, 0, 0))
+        surface = body_font.render(f"{x}: {round(results[x][0] * 100, 2)}%", True, (0, 0, 0))
         screen.blit(surface, (448 + 4, 0 + 40 + x * 20 + 2))
 
 prev_pos = (-1, -1)
@@ -81,6 +82,8 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DELETE:
                 drawing_board.fill((0, 0, 0))
+            if event.key == pygame.K_e:
+                Image.fromarray(np.uint8(img.reshape(28, 28) * 255), mode="L").show()
         if pygame.mouse.get_pressed()[0]:
             x, y = pygame.mouse.get_pos()
             if (prev_pos == (-1, -1)): 
@@ -90,6 +93,7 @@ while running:
             pygame.draw.circle(drawing_board, (255, 255, 255), (x, y), 9)
             prev_pos = (x, y)
             evaluate_image()
+
         else: 
             prev_pos = (-1, -1)
 
