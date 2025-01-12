@@ -33,7 +33,12 @@ class Dense():
     def backprop(self, activation_sensitivity):
         # partial derivatives magic
         # calc how sensitive the bias is (calculate the sigmoid deriv and multiply by how sensitive the output activations are)
-        self.bias_sensitivity = activation_sensitivity * self.d_activation(self.weighted_sums)
+        if self.activation == self.softmax:
+            # tranposes along the second and third axis
+            self.bias_sensitivity = np.matmul(self.d_activation(self.weighted_sums), activation_sensitivity)
+        else:
+            self.bias_sensitivity = activation_sensitivity * self.d_activation(self.weighted_sums)
+        
         # calc how sensitive weights are, input is transposed for matrix multiplication purposes
         self.weight_sensitivity = np.matmul(self.bias_sensitivity, self.inputs.transpose([0, 2, 1]))
         # return the sensitivity of previous activation, will be used in next layer
