@@ -3,10 +3,22 @@ import json
 import time
 
 class Network:
-    def __init__(self):
+    def __init__(self, cost="crossentropy"):
         self.layers = []
         self.size = []
+        if cost == "MSE":
+            self.cost = self.MSE
+            self.d_cost = self.d_MSE
+        if cost == "crossentropy":
+            self.cost = self.xentropy
+            self.d_cost = self.d_xentropy
 
+    def cost(self, output, expected):
+        return output
+
+    def d_cost(self, output, expected):
+        return output
+    
     def add_layers(self, *layers):
         for l in layers:
             self.layers.append(l)
@@ -83,12 +95,18 @@ class Network:
           total_correct += np.sum(np.argmax(out, axis=1) == np.argmax(val_y[i], axis=1))
 
         return total_correct, total_cost
-
-    def cost(self, output, expected):
+    
+    def MSE(self, output, expected):
         return np.square(output - expected)
 
-    def d_cost(self, output, expected):
+    def d_MSE(self, output, expected):
         return 2 * (output - expected)
+    
+    def xentropy(self, output, expected):
+        return -expected * np.log(output)
+
+    def d_xentropy(self, output, expected):
+        return -expected/output
 
     def load_model(self, filename):
         f = open(filename, "r")
