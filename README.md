@@ -2,7 +2,7 @@ Multi-layer perception from scratch; no Pytorch or Tensorflow. 96% accuracy on M
 
 # Motivation
 
-Neural networks are a fantastic algorithm: they have so many free parameters that can be tuned to continously learn and improve. I wanted to get a strong, intuitive understanding of how these networks learn; what better way then coding one from scratch? No external ML libraries like PyTorch or TensorFlow, just numpy and a whole lot of linear algebra.
+Neural networks are a fantastic algorithm: they have so many free parameters that can be tuned to continuously learn and improve. I wanted to get a strong, intuitive understanding of how these networks learn; what better way then coding one from scratch? No external ML libraries like PyTorch or TensorFlow, just numpy and a whole lot of linear algebra.
 
 # Running the code
 To run the website:
@@ -77,7 +77,7 @@ w_{2, 1} \cdot a_1 + w_{2, 2} \cdot a_2 + \cdots + w_{2, n} \cdot a_n + b_2 \\
 w_{m, 1} \cdot a_1 + w_{m, 2} \cdot a_2 + \cdots + w_{m, n} \cdot a_n + b_m \end{pmatrix}
 $$
 
-The output weighted sums is then put through something known as an **activation function**, to get the final activations. My model suports three: ReLU, sigmoid and softmax.
+The output weighted sums is then put through something known as an **activation function**, to get the final activations. My model supports three: ReLU, sigmoid and softmax.
 
 $$
 ReLU(z) = max(0, z)
@@ -103,20 +103,21 @@ $$
 $$
 
 $$
-\text{Cross-Entropy} = - \sum_{i=1}^{n} y_i \log(\hat{y}_i)
+\text{Cross-Entropy} = -\sum_{i=1}^{n} y_i \log(\hat{y}_i)
 $$
+
 The goal of any neural network is to minimize the cost.
 
-## Backpropogation
-The key to neural networks learning is the backpropogation algorithm. What it does is computes the gradient of the cost function $\nabla C$, which tells you how much the weights and biases need to change to decrease the cost function.
-If that confuses you, think abut it this way: the gradient is just the slope of the tangent line to the equation. Say you had a curve and wanted to find a realtive minima. You can do that by calculating its derivitave (gradient in this case) and adjusting your x values until you reach the minimum.
+## Backpropagation
+The key to neural networks learning is the backpropagation algorithm. What it does is computes the gradient of the cost function $\nabla C$, which tells you how much the weights and biases need to change to decrease the cost function.
+If that confuses you, think abut it this way: the gradient is just the slope of the tangent line to the equation. Say you had a curve and wanted to find a relative minima. You can do that by calculating its derivative (gradient in this case) and adjusting your x values until you reach the minimum.
 
-The backpropogation algorithm, as you can probably already guess, requires differentiaton and calculus. Specifically, it uses a lot of the chain rule to determine gradients. 
+The backpropagation algorithm, as you can probably already guess, requires differentiation and calculus. Specifically, it uses a lot of the chain rule to determine gradients. 
 
 One other important concept is the **learn rate**. The learn rate is the factor which we multiply our gradients by adding them onto our weights and biases. Remember, the derivative of a function only gives the instantaneous rate of change, so we'll need a learn rate that is small enough to give predictable behavior, but large enough so that training isn't too slow.
 
 ### Calculus symbols 
-To start backpropogating, we'll first need the partial derivaitve of the last layer's activations to the cost function.
+To start backpropagating, we'll first need the partial derivative of the last layer's activations to the cost function.
 
 $$
 \frac{\partial C}{\partial a}
@@ -132,17 +133,17 @@ $$
 \frac{\partial a}{\partial b} = \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial b}
 $$
 
-And to continue back propogation through layers, it's important to calculate the derivative of the previous layer's activation with respect to the current layer.
+And to continue back propagation through layers, it's important to calculate the derivative of the previous layer's activation with respect to the current layer.
 
 $$
 \frac{\partial a}{\partial a_{\text{prev}}} = \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial a_{\text{prev}}}
 $$
 
-When we backpropogate, what we're essentially doing is
+When we backpropagate, what we're essentially doing is
 1. Find the sensitivity of the last layer's activations to the cost function
 2. Repeat for all layers:
     1. Use the activation sensitivity, and compute the weight and bias gradients
-    2. Find the sensitvity to last layer's activation
+    2. Find the sensitivity to last layer's activation
     3. Pass in that value as the next layers activation sensitivity
 3. Update the weights and biases based on their gradients, multiplied by learn rate
 
