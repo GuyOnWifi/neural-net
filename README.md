@@ -22,7 +22,10 @@ The multilayer perceptron is made up of layers of neurons. Each neuron has an ac
 Each activation is represented as a (n x 1) vector
 
 $$
-\mathbf{a} = \begin{pmatrix} a_1 \\ a_2 \\ \vdots \\ a_n \end{pmatrix}
+\mathbf{a} = \begin{pmatrix} a_1 \\ 
+a_2 \\ 
+\vdots \\ 
+a_n \end{pmatrix}
 $$
 
 Each weight is represented by a (m x n) matrix, where m is the number of output neurons and n is the number of input neurons.
@@ -30,50 +33,48 @@ Each weight $w_{i,j}$ represents the connection between the $j$-th input neuron 
 
 $$
 \mathbf{w} = \begin{pmatrix} 
-
 w_{1,1} & w_{1,2} & \cdots & w_{1,n} \\
 w_{2,1} & w_{2,2} & \cdots & w_{2,n} \\
 \vdots & \vdots & \ddots & \vdots \\
 w_{m,1} & w_{m,2} & \cdots & w_{m,n}
-
 \end{pmatrix}
 $$
 
 The bias can be represented as a (m x 1) matrix
 
 $$
-\mathbf{b} = \begin{pmatrix} b_1 \\ b_2 \\ \vdots \\ b_m \end{pmatrix}
+\mathbf{b} = \begin{pmatrix} b_1 \\ 
+b_2 \\ 
+\vdots \\ 
+b_m \end{pmatrix}
 $$
 
 The weighted sums $z$ can be represented as the dot product of the activations and weights matrix, plus the bias matrix
 
 $$
-z = 
-\begin{pmatrix} 
-
-w_{1,1} & w_{1,2} & \cdots & w_{1,n} \\
+\mathbf{z} = \begin{pmatrix} w_{1,1} & w_{1,2} & \cdots & w_{1,n} \\
 w_{2,1} & w_{2,2} & \cdots & w_{2,n} \\
 \vdots & \vdots & \ddots & \vdots \\
-w_{m,1} & w_{m,2} & \cdots & w_{m,n}
-
-\end{pmatrix}
-
-\begin{pmatrix} a_1 \\ a_2 \\ \vdots \\ a_n \end{pmatrix}
+w_{m,1} & w_{m,2} & \cdots & w_{m,n} \end{pmatrix}
+\begin{pmatrix} a_1 \\ 
+a_2 \\ 
+\vdots \\ 
+a_n \end{pmatrix}
 +
-\begin{pmatrix} b_1 \\ b_2 \\ \vdots \\ b_m \end{pmatrix}
+\begin{pmatrix} b_1 \\ 
+b_2 \\ 
+\vdots \\ 
+b_m \end{pmatrix}
 $$
 
 which expands out to
 
 $$
-z =
-\begin{pmatrix}
-w_{1, 1} \cdot a_1 + w_{1, 2} \cdot a_2 + \cdots + w_{1, n} \cdot a_n + b_1 \\
+\mathbf{z} =
+\begin{pmatrix} w_{1, 1} \cdot a_1 + w_{1, 2} \cdot a_2 + \cdots + w_{1, n} \cdot a_n + b_1 \\
 w_{2, 1} \cdot a_1 + w_{2, 2} \cdot a_2 + \cdots + w_{2, n} \cdot a_n + b_2 \\
 \vdots \\
-w_{m, 1} \cdot a_1 + w_{m, 2} \cdot a_2 + \cdots + w_{m, n} \cdot a_n + b_m
-
-\end{pmatrix}
+w_{m, 1} \cdot a_1 + w_{m, 2} \cdot a_2 + \cdots + w_{m, n} \cdot a_n + b_m \end{pmatrix}
 $$
 
 The output weighted sums is then put through something known as an **activation function**, to get the final activations. My model suports three: ReLU, sigmoid and softmax.
