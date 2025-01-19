@@ -5,18 +5,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - name: Clone repository code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Build the website
         run: |
           cd ${{ github.workspace }}
           cd website
           npm install
           npm run build
-      - run: echo "Website has been built"
+  deploy:
+      needs: build
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          # Specify the directory to deploy from
-          publish_dir: ${{ github.workspace }}/website/dist  # Update this if your build directory is different
+          publish_dir: ${{ github.workspace }}/website/dist 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
