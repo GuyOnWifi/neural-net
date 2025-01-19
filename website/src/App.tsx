@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import network from "./assets/network.json";
 import * as math from "mathjs";
-import { Image, InterpolationAlgorithm } from "image-js";
+import { Image } from "image-js";
 
 import {
   Chart as ChartJS,

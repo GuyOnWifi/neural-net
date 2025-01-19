@@ -19,4 +19,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           # Specify the directory to deploy from
-          publish_dir: ${{ github.workspace }}/website/build  # Update this if your build directory is different
+          publish_dir: ${{ github.workspace }}/website/dist  # Update this if your build directory is different
