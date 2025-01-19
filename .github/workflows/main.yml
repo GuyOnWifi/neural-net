@@ -14,7 +14,9 @@ jobs:
           npm install
           npm run build
   deploy:
-      needs: build
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
