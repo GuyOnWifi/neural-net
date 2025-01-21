@@ -100,18 +100,40 @@ function App() {
   } 
 
   // Handle mouse down event to start drawing
-  const startDrawing = (e : React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e : any) => {
     isDrawing.current = true;
-    const { offsetX, offsetY } = e.nativeEvent;
-    lastPosition.current = { x: offsetX, y: offsetY };
+
+    if (e.touches) {
+      const touch = e.touches[0];
+      const rect = canvasRef.current!.getBoundingClientRect();
+      lastPosition.current = {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top,
+      };
+    } else {
+      const { offsetX, offsetY } = e.nativeEvent;
+      lastPosition.current = { x: offsetX, y: offsetY };
+    }
+
   };
 
   // Handle mouse move event to draw lines
-  const draw = (e : React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e : any) => {
     if (!isDrawing.current) return;
     if (!canvasRef.current) return;
 
-    const { offsetX, offsetY } = e.nativeEvent;
+    let offsetX, offsetY;
+
+    if (e.touches) {
+      const touch = e.touches[0];
+      const rect = canvasRef.current!.getBoundingClientRect();
+      offsetX = touch.clientX - rect.left;
+      offsetY = touch.clientY - rect.top;
+    } else {
+      offsetX = e.nativeEvent.offsetX;
+      offsetY = e.nativeEvent.offsetY;
+    }
+
     const ctx = canvasRef.current.getContext('2d')!;
     const scale = document.getElementById("drawing-pad")?.clientWidth! / 28;
 
@@ -160,17 +182,21 @@ function App() {
     <div className="flex flex-col sm:flex-row gap-4 w-[100vw] p-4 box-border">
       <div className="flex flex-col gap-2 sm:grow-[2]">
         <div id="drawing-pad" className="">
-          <canvas
-            ref={canvasRef}
-            width={28}
-            height={28}
-            style={{ backgroundColor: 'black' }}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseOut={stopDrawing}
-            className="w-[100%] border-2"
-          />
+        <canvas
+          ref={canvasRef}
+          width={28}
+          height={28}
+          style={{ backgroundColor: 'black' }}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseOut={stopDrawing}
+          onTouchStart={startDrawing}      // Add touch support
+          onTouchMove={draw}               // Add touch support
+          onTouchEnd={stopDrawing}         // Add touch support
+          onTouchCancel={stopDrawing}      // Add touch support
+          className="w-[100%] border-2"
+        />
         </div>
         <div onClick={clearCanvas} className="border-2 border-white cursor-pointer p-2 text-center">Clear</div>
       </div>
