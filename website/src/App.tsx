@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import network from "./assets/network.json";
 import * as math from "mathjs";
 import { Image } from "image-js";
