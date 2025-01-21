@@ -144,7 +144,7 @@ function App() {
     ctx.lineJoin = 'round';  // Smoother joints between lines
     ctx.lineCap = 'round';   // Smoother end points of lines
     ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.75;
     ctx.stroke();
 
     lastPosition.current = { x: offsetX, y: offsetY };
