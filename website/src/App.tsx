@@ -32,7 +32,7 @@ const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'top' as const,
+      display: false
     },
     title: {
       display: true,
@@ -88,7 +88,7 @@ function App() {
     let img = await Image.load(canvasRef.current.toDataURL());
     img = img.grey();
     img = img.resize({ width: 28, height: 28});
-    
+
     let inp = math.matrix(Array.from(img.data));
     inp = math.dotDivide(inp, 255);
     inp = math.reshape(inp, [784, 1]);
@@ -122,7 +122,7 @@ function App() {
     ctx.lineJoin = 'round';  // Smoother joints between lines
     ctx.lineCap = 'round';   // Smoother end points of lines
     ctx.strokeStyle = 'white';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     lastPosition.current = { x: offsetX, y: offsetY };
@@ -157,9 +157,9 @@ function App() {
   }, [data])
 
   return (
-    <div className="flex flex-row gap-4">
-      <div className="flex flex-col gap-2 grow min-w-[500px] min-h-[500px]">
-        <div id="drawing-pad" className="grow">
+    <div className="flex flex-col sm:flex-row gap-4 w-[100vw] p-4 box-border">
+      <div className="flex flex-col gap-2 sm:grow-[2]">
+        <div id="drawing-pad" className="">
           <canvas
             ref={canvasRef}
             width={28}
@@ -174,8 +174,8 @@ function App() {
         </div>
         <div onClick={clearCanvas} className="border-2 border-white cursor-pointer p-2 text-center">Clear</div>
       </div>
-      <div className="border-white border-2 grow">
-        <Bar options={options} data={data} />
+      <div className="border-white border-2 grow relative">
+        <Bar options={options} data={data} className="relative left-[50%] translate-x-[-50%]" />
       </div>
     </div>
   );
