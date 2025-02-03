@@ -101,6 +101,7 @@ function App() {
 
   // Handle mouse down event to start drawing
   const startDrawing = (e : any) => {
+    e.preventDefault();
     isDrawing.current = true;
 
     if (e.touches) {
@@ -119,6 +120,7 @@ function App() {
 
   // Handle mouse move event to draw lines
   const draw = (e : any) => {
+    e.preventDefault();
     if (!isDrawing.current) return;
     if (!canvasRef.current) return;
 
@@ -152,7 +154,8 @@ function App() {
   };
 
   // Handle mouse up event to stop drawing
-  const stopDrawing = () => {
+  const stopDrawing = (e: any) => {
+    e.preventDefault();
     isDrawing.current = false;
   };
 
