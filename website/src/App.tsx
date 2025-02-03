@@ -101,7 +101,6 @@ function App() {
 
   // Handle mouse down event to start drawing
   const startDrawing = (e : any) => {
-    e.preventDefault();
     isDrawing.current = true;
 
     if (e.touches) {
@@ -120,7 +119,6 @@ function App() {
 
   // Handle mouse move event to draw lines
   const draw = (e : any) => {
-    e.preventDefault();
     if (!isDrawing.current) return;
     if (!canvasRef.current) return;
 
@@ -155,7 +153,6 @@ function App() {
 
   // Handle mouse up event to stop drawing
   const stopDrawing = (e: any) => {
-    e.preventDefault();
     isDrawing.current = false;
   };
 
@@ -171,11 +168,19 @@ function App() {
   useEffect(() => {
     clearCanvas();
     neuralNet.current = new NeuralNet(network);
-    let a = math.random([784, 1]);
-    // @ts-ignore
-    let res = neuralNet.current.feedforward(a);
-    console.log(res);
-  }, [])
+
+    canvasRef.current!.addEventListener('touchstart', function(event) {
+      event.preventDefault(); // Disable touchstart
+    }, { passive: false });
+
+    canvasRef.current!.addEventListener('touchmove', function(event) {
+      event.preventDefault(); // Disable touchmove
+    }, { passive: false });
+
+    canvasRef.current!.addEventListener('touchend', function(event) {
+      event.preventDefault(); // Disable touchend
+    }, { passive: false });
+  }, [canvasRef])
 
   useEffect(() => {
     console.log(data);
