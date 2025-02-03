@@ -80,11 +80,11 @@ $$
 The output weighted sums is then put through something known as an **activation function**, to get the final activations. My model supports three: ReLU, sigmoid and softmax.
 
 $$
-ReLU(z) = max(0, z)
+\text{ReLU}(z) = max(0, z)
 $$
 
 $$
-sigmoid(z) = \frac{1}{1+e^{-z}}
+\text{sigmoid}(z) = \frac{1}{1+e^{-z}}
 $$
 
 $$
