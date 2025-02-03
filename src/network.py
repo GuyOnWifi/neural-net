@@ -28,6 +28,7 @@ class Network:
             self.size.append(l.shape[1])
 
     def feedforward(self, input):
+        # feeds the output of one layer as the input to the next
         for l in self.layers:
             input = l.feedforward(input)
         return input
@@ -42,13 +43,17 @@ class Network:
     def sgd(self, training_data, learn_rate, lmbda, epochs=1, validation_data=None):
         tr_x, tr_y = training_data
         previous_cost = None
+
+        # calculate the total amount of samples
         train_data_size = 0
         for t in training_data[0]:
           train_data_size += len(t)
+
         val_data_size = 0
         for v in validation_data[0]:
           val_data_size += len(v)
 
+        # for each epoch
         for i in range(epochs):
             start = time.time()
             training_correct = 0
@@ -58,16 +63,22 @@ class Network:
                 # feed data through model to calc weights, biases, activations, etc
                 batch_size = tr_x[batch_num].shape[0]
                 output = self.feedforward(tr_x[batch_num])
+
+                # perform backpropagation and update parameters 
                 self.backprop(output, tr_y[batch_num])
                 self.update_parameters(learn_rate, lmbda, batch_size, train_data_size)
 
+                # update the statistics and print them
                 training_correct += np.sum(np.argmax(output, axis=1) == np.argmax(tr_y[batch_num], axis=1))
                 training_total += batch_size
                 training_cost += np.sum(self.cost(output, tr_y[batch_num]))
                 print(f"\rEpoch {i + 1}/{epochs}: ({batch_num + 1}/{len(tr_x)}) | Accuracy: {training_correct}/{training_total} | Cost: {training_cost / training_total}", end="")
 
+            # once training a batch is done, print out statistics
             elapsed = (time.time() - start) * 1000
             print(f"\rEpoch {i + 1} Complete, Time: {round(elapsed)}ms ({round(elapsed / len(tr_x))}ms/batch), Test Accuracy: {training_correct} / {training_total}, Average Test Cost: {training_cost / training_total}", end="")
+            
+            # if there is validation data, add those to the statistics
             if validation_data:
                 correct, total_cost = self.evaluate(validation_data)
                 avg_cost = total_cost / val_data_size
@@ -133,4 +144,3 @@ class Network:
         f = open(filename, "w")
         json.dump(data, f)
         f.close()
-
