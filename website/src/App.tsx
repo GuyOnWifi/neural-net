@@ -152,7 +152,7 @@ function App() {
   };
 
   // Handle mouse up event to stop drawing
-  const stopDrawing = (e: any) => {
+  const stopDrawing = () => {
     isDrawing.current = false;
   };
 
